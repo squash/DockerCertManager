@@ -93,6 +93,7 @@ if [ "${COMMAND}" == "client" ]; then
 	openssl req -subj "/CN=${TARGET}" -new -key ${MYHOME}/${TARGET}-client-key.pem -out ${MYHOME}/${TARGET}-client.csr
 	openssl x509 -req -days 365 -in ${MYHOME}/${TARGET}-client.csr -CA ${MYHOME}/ca.pem -CAkey ${MYHOME}/ca-key.pem -out ${MYHOME}/${TARGET}-client-cert.pem -extfile ${MYHOME}/extfile.cnf
 	openssl rsa -in  ${MYHOME}/${TARGET}-client-key.pem -out  ${MYHOME}/${TARGET}-client-key.pem
+	rm -f ${MYHOME}//${TARGET}-client.csr
 	echo "Your client keys have been created."
 	echo "The required files are ${MYHOME}/${TARGET}-client-key.pem, ${MYHOME}/${TARGET}-client-cert.pem, and ${MYHOME}/ca.pem"
 	echo "Copy them to your client in ~/.docker as key.pem, cert.pem, and ca.pem and chmod 400 to have them automatically used when you use --tlsverify"
