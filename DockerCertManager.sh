@@ -96,6 +96,7 @@ if [ "${COMMAND}" == "client" ]; then
 	echo "Your client keys have been created."
 	echo "The required files are ${MYHOME}/${TARGET}-client-key.pem, ${MYHOME}/${TARGET}-client-cert.pem, and ${MYHOME}/ca.pem"
 	echo "Copy them to your client in ~/.docker as key.pem, cert.pem, and ca.pem and chmod 400 to have them automatically used when you use --tlsverify"
+	echo "Example connection: docker --tlsverify -H example.com:4243 ps"
 	exit 0
 fi
 
