@@ -106,6 +106,6 @@ echo -e "\tinitca - creates a new Certificate Authority"
 echo -e "\tserver [hostname] - Create a new Server key and Certificate for a given hostname"
 echo -e "\tclient [name] - Create a new Client Certificate for a given client name"
 echo
-echo "https://github.com/squash/DockerCertmanager"
+echo "https://github.com/squash/DockerCertManager"
 exit
 
