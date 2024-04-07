@@ -38,7 +38,7 @@ then
 	echo "Creating a new Certificate Authority"
 	openssl genrsa -out ${MYHOME}/ca-key.pem
 	openssl req -subj '/CN=docker' -new -x509 -days 9999 -key ${MYHOME}/ca-key.pem -out ${MYHOME}/ca.pem
-	echo extendedKeyUsage = clientAuth > ${MYHOME}/extfile.cnf
+	echo extendedKeyUsage = clientAuth,serverAuth > ${MYHOME}/extfile.cnf
 	echo 01 > ${MYHOME}/ca.srl
 	echo "Now you may create server and client keys."
 	exit 0
@@ -62,9 +62,12 @@ if [ "${COMMAND}" == "server" ]; then
 		fi
 
 		echo "Creating Server Certificate For ${TARGET}"
+		cp extfile.cnf extfile.server.cnf
+		echo "subjectAltName=DNS:${TARGET}" >> extfile.server.cnf
+
 		openssl genrsa -out  ${MYHOME}/${TARGET}-server-key.pem 2048
-		openssl req -subj "/CN=${TARGET}" -new -key  ${MYHOME}/${TARGET}-server-key.pem -out  ${MYHOME}/${TARGET}-server.csr
-		openssl x509 -req -days 9999 -in  ${MYHOME}/${TARGET}-server.csr -CA ${MYHOME}/ca.pem -CAkey ${MYHOME}/ca-key.pem -out  ${MYHOME}/${TARGET}-server-cert.pem
+		openssl req -subj "/CN=${TARGET}" -new -key  ${MYHOME}/${TARGET}-server-key.pem -out  ${MYHOME}/${TARGET}-server.csr 
+		openssl x509 -req -days 9999 -in  ${MYHOME}/${TARGET}-server.csr -CA ${MYHOME}/ca.pem -CAkey ${MYHOME}/ca-key.pem -out  ${MYHOME}/${TARGET}-server-cert.pem -extfile ${MYHOME}/extfile.server.cnf
 		openssl rsa -in  ${MYHOME}/${TARGET}-server-key.pem -out  ${MYHOME}/${TARGET}-server-key.pem
 		rm -f ${MYHOME}/${TARGET}-server.csr
 		echo "Your server keys have been created: ."
@@ -89,9 +92,12 @@ if [ "${COMMAND}" == "client" ]; then
 		echo "The files are ${MYHOME}/${TARGET}-client-key.pem and ${MYHOME}/${TARGET}-client-cert.pem"
 		exit 1
 	fi
+	cp extfile.cnf extfile.client.cnf
+	echo "subjectAltName=DNS:${TARGET}" >> extfile.client.cnf
+
 	openssl genrsa -out ${MYHOME}/${TARGET}-client-key.pem 2048
-	openssl req -subj "/CN=${TARGET}" -new -key ${MYHOME}/${TARGET}-client-key.pem -out ${MYHOME}/${TARGET}-client.csr
-	openssl x509 -req -days 365 -in ${MYHOME}/${TARGET}-client.csr -CA ${MYHOME}/ca.pem -CAkey ${MYHOME}/ca-key.pem -out ${MYHOME}/${TARGET}-client-cert.pem -extfile ${MYHOME}/extfile.cnf
+	openssl req -subj "/CN=${TARGET}" -new -key ${MYHOME}/${TARGET}-client-key.pem -out ${MYHOME}/${TARGET}-client.csr 
+	openssl x509 -req -days 365 -in ${MYHOME}/${TARGET}-client.csr -CA ${MYHOME}/ca.pem -CAkey ${MYHOME}/ca-key.pem -out ${MYHOME}/${TARGET}-client-cert.pem -extfile ${MYHOME}/extfile.client.cnf
 	openssl rsa -in  ${MYHOME}/${TARGET}-client-key.pem -out  ${MYHOME}/${TARGET}-client-key.pem
 	rm -f ${MYHOME}//${TARGET}-client.csr
 	echo "Your client keys have been created."
